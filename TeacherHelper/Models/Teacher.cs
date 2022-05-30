@@ -11,5 +11,8 @@ namespace TeacherHelper.Models
         [Required]
         public string LastName { get; set; }
 
+        public Logbook Logbook { get; set; }
+        public Grade Grade { get; set; }
+
     }
 }
