@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using TeacherHelper.Data;
+using TeacherHelper.DataAccess.Repository.Data;
 
 #nullable disable
 
@@ -232,7 +232,12 @@ namespace TeacherHelper.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("TeacherId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("TeacherId");
 
                     b.ToTable("Grades");
                 });
@@ -249,7 +254,12 @@ namespace TeacherHelper.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("TeacherId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("TeacherId");
 
                     b.ToTable("Logbooks");
                 });
@@ -269,7 +279,7 @@ namespace TeacherHelper.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("GradeId")
+                    b.Property<int?>("GradeId")
                         .HasColumnType("int");
 
                     b.Property<string>("LastName")
@@ -295,21 +305,11 @@ namespace TeacherHelper.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("GradeId")
-                        .HasColumnType("int");
-
                     b.Property<string>("LastName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("LogbookId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("GradeId");
-
-                    b.HasIndex("LogbookId");
 
                     b.ToTable("Teachers");
                 });
@@ -365,34 +365,43 @@ namespace TeacherHelper.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("TeacherHelper.Models.Grade", b =>
+                {
+                    b.HasOne("TeacherHelper.Models.Teacher", "Teacher")
+                        .WithMany("Grades")
+                        .HasForeignKey("TeacherId");
+
+                    b.Navigation("Teacher");
+                });
+
+            modelBuilder.Entity("TeacherHelper.Models.Logbook", b =>
+                {
+                    b.HasOne("TeacherHelper.Models.Teacher", "Teacher")
+                        .WithMany("Logbooks")
+                        .HasForeignKey("TeacherId");
+
+                    b.Navigation("Teacher");
+                });
+
             modelBuilder.Entity("TeacherHelper.Models.Student", b =>
                 {
                     b.HasOne("TeacherHelper.Models.Grade", "Grade")
-                        .WithMany()
-                        .HasForeignKey("GradeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .WithMany("Students")
+                        .HasForeignKey("GradeId");
 
                     b.Navigation("Grade");
                 });
 
+            modelBuilder.Entity("TeacherHelper.Models.Grade", b =>
+                {
+                    b.Navigation("Students");
+                });
+
             modelBuilder.Entity("TeacherHelper.Models.Teacher", b =>
                 {
-                    b.HasOne("TeacherHelper.Models.Grade", "Grade")
-                        .WithMany()
-                        .HasForeignKey("GradeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Navigation("Grades");
 
-                    b.HasOne("TeacherHelper.Models.Logbook", "Logbook")
-                        .WithMany()
-                        .HasForeignKey("LogbookId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Grade");
-
-                    b.Navigation("Logbook");
+                    b.Navigation("Logbooks");
                 });
 #pragma warning restore 612, 618
         }
